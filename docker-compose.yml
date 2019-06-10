@@ -1,0 +1,79 @@
+version: '3.7'
+services:
+    health-check:
+        container_name: health-check
+        build:
+            context: .
+            dockerfile: .docker/node.dockerfile
+        command: npm run start
+        env_file: 
+            - .env
+        environment:
+            - LOCATION=Dev
+            - MDB=${MONGODB}
+            - NODE_ENV=development
+        volumes:
+          - .:/node/app
+          - /node/app/node_modules
+          - .node_logs:/root/.npm/
+        expose:
+            - ${APP_PORT}
+        networks:
+            - node-net
+            - lendDocNet
+            - traefik
+        labels:            
+            - traefik.frontend.rule=Host:health-check.mylendpro.com
+            - traefik.port=${APP_PORT}
+            - traefik.docker.network=traefik
+            - traefik.backend=health-check 
+    hc-redis:
+        container_name: hc-redis
+        image: redis:alpine
+        networks:
+            - node-net
+        labels:
+            - traefik.enable=false
+    hc-mongo:
+        container_name: hc-mongo
+        image: mongo:4.1.8        
+        environment:
+            MONGO_INITDB_ROOT_USERNAME: root
+            MONGO_INITDB_ROOT_PASSWORD: tango
+        networks:
+            - node-net
+        labels:
+            - traefik.enable=false
+        volumes:
+            - mongo-db:/data/db
+
+    hc-mongo-express:
+        container_name: hc-monex
+        image: mongo-express
+        restart: always
+        ports:
+           - 8081:8081
+        environment:
+            ME_CONFIG_MONGODB_ADMINUSERNAME: root
+            ME_CONFIG_MONGODB_ADMINPASSWORD: tango
+            ME_CONFIG_MONGODB_SERVER: hc-mongo
+        networks:
+            - node-net
+        labels:
+            - traefik.frontend.rule=Host:hc-mongx.mylendpro.com
+            - traefik.port=8081 
+            - traefik.docker.network=traefik
+            - traefik.backend=hc-mongx 
+            
+volumes:
+    mongo-db:
+        external: false
+
+
+networks:
+    node-net:
+        external: false
+    traefik:
+        external: true
+    lendDocNet:
+        external: true
