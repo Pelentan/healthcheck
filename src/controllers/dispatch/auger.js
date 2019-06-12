@@ -21,21 +21,22 @@ const roundReport = (drone) => {
     }
 }
 
-const invokeErrProt =(remoteDrone)=>{
-  remoteDrone.incErrCount(); 
-  console.log("errorsy count: " + remoteDrone.errCount + " == " + remoteDrone.errThreshold);
-  //console.log(remoteDrone);
-  if(remoteDrone.errCount === remoteDrone.errThreshold){
-    remoteDrone.triggerErrState();
+const invokeErrProt =(drone)=>{
+  drone.incErrCount(); 
+  console.log("errorsy count: " + drone.errCount + " == " + drone.errThreshold);
+  console.log(`***FAIL*** ${drone.cycleTS_start} - ${drone.cycleTS_stop}` + " ==> " + drone.name + " -- " + drone.cycleSuccessMsg);
+ //console.log(drone);
+  if(drone.errCount === drone.errThreshold){
+    drone.triggerErrState();
     const parcel = {
       epTemplate: 1,
-      epName: remoteDrone.name,
-      epId: remoteDrone.id,
-      epShortMessage: remoteDrone.errors.shortMsg,
-      epTarget: remoteDrone.uri,
-      messageGroup: remoteDrone.alertGroup,
-      errorCount: remoteDrone.errCount,
-      errorReport: JSON.stringify(remoteDrone.errors),
+      epName: drone.name,
+      epId: drone.id,
+      epShortMessage: drone.errors.shortMsg,
+      epTarget: drone.uri,
+      messageGroup: drone.alertGroup,
+      errorCount: drone.errCount,
+      errorReport: JSON.stringify(drone.errors),
       response: ""//data,
     };
     invokeCalls(parcel);

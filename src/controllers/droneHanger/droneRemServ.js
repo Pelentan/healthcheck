@@ -31,8 +31,9 @@ class DroneRemServ extends DroneSSD{
       console.log("Initiating scan for module: " + module.name);
       module.initScan(moduleData, this);
     })
-    
+    console.log("Rack size: " + this.moduleRack.length);
     while(this.moduleRack.length > this.watchReport.length){
+      console.log("WatchReport size: " + this.watchReport.length);
       console.log("waiting for cycle to finish");
       await new Promise((resolve, reject)=>setTimeout(resolve, 500));
     }

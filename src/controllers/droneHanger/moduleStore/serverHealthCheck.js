@@ -1,48 +1,119 @@
 const fs = require('fs');
 const path = require('path');
-const Client = require('ssh2').Client;
+const node_ssh = require('node-ssh');
 const moment = require('moment');
 
 const ModuleSSD = require('./moduleSSD');
+const SCP = require('../../argh/scp');
 
-class ReturnJason extends ModuleSSD{
+class ServerHealthCheck extends ModuleSSD{
   constructor(moduleData){
     super(moduleData);
   }
+  
+  async initScan(eventData, drone){
+    const ssh = new node_ssh();
 
-  initScan(eventData, drone){
-    const conSetup = {
+    //console.log(eventData);
+    const connSetup = {
       host:  this.url,
-      port: 22,
+      port: this.port,
       readyTimeout: this.timeout,
       username: this.authInfo.user,
-      privatekey: this.authInfo.key,
+      //password: "toga",
+      privateKey: this.privKeys + this.authInfo.key,
+      passphrase: this.authInfo.pass,      
     }
-    eventData.request = conSetup;
-    //console.log(reqSetup);
-    const conn = new Client();
-    conn.on('ready', ()=>{
-      console.log('Client :: ready');
-      conn.exec('uptime', function(err, stream) {
-        if (err) throw err;
-        stream.on('close', function(code, signal) {
-          console.log('Stream :: close :: code: ' + code + ', signal: ' + signal);
-          conn.end();
-        }).on('data', function(data) {
-          console.log('STDOUT: ' + data);
-        }).stderr.on('data', function(data) {
-          console.log('STDERR: ' + data);
-        });
-      });
-      conn.end;
-      const connTime = moment();
-      eventData.dateTime = now.format('YYYY-MM-DD HH:mm:ss.SSS')
-    })
-    .on('error',()=>{  
+    eventData.request = connSetup;
+    let now = moment();
+    eventData.dateTime = now.format('YYYY-MM-DD HH:mm:ss.SSS')
+    await ssh.connect(connSetup).then(()=>{
+      console.log(`Module ${this.name}: Connection made.`);
+    }).catch((err)=>{
+      console.log(err);
       eventData.err = true;
-      eventData.errors.push(error);
-    }).connect({conSetup});    
+      eventData.errorList = err;
+      drone.errors = err;
+      eventData.shortMsg = "Failed to make connection";
+      drone.watchReport = eventData;
+      return true;
+    });
+    const command = this.buildCommand(this.dataPost);
+    await ssh.execCommand(`${command}`).then((result) => {
+      if(this.dataPost.exitCode && this.dataPost.exitCodePass != result.code){
+        eventData.err = true;
+        eventData.errorList = result.stderr;
+        drone.errors = result.stderr;
+        eventData.shortMsg = "HC script failed to complete.";
+        drone.watchReport = eventData;
+        return true;
+      }
+      eventData.errors = result.stderr;
+    }).catch((err)=>{
+      console.log("Woopsy!");
+      console.log(err);
+      eventData.err = true;
+      eventData.errorList = err;
+      drone.errors = err;
+      evendData.shortMsg = "HC script failed to complete.";
+      drone.watchReport = eventData;
+      return true;
+    }); 
+    
+    now = moment();
+    let fileTS = now.format('HH_mm_ss^SSS');
+    const downloadFile = `${this.downloadDir}/${this.dataReturn.returnFile}`
+    const remoteFile = `${connSetup.username}@${connSetup.host}:~/${this.dataReturn.returnFile}`;
+    
+    const pk = `${this.privKeys}${this.authInfo.key}`;
+    eventData.downloadStart = now.format('HH:mm:ss:SSS');
+    
+    const clown = require('child_process').exec
+    // console.log(`Remote file: ${remoteFile}`);
+    // console.log(`Download file: ${downloadFile}`);
+    // console.log(this);
+    const executor = clown(`scp -i ${pk} ${remoteFile} ${downloadFile}`);
+    //const executor = clown('scp -i /home/hcdronedock/.ssh/hc_npp hcdronedock@hc-mongo:hc-server-report.hc .')
+    
+    executor.stderr.on('data', function(data) {
+      console.log(data.toString());
+    });
+    
+    executor.stdout.on('data', function(data) {
+        console.log(data.toString());
+    });
+    
+    executor.stdout.on('end', function(data) {
+        console.log("copied");
+    });
+
+    executor.on('error', (err)=>{console.log(err);})
+    
+    executor.on('close', function(code) {
+        if (code !== 0) {
+            console.log('Failed: ' + code);
+        }
+    });
+
+    // await ssh.getFile(downloadFile, remoteFile).then((fileContents)=>{
+    //   console.log(fileContents);
+    // }).catch((err)=>{    
+    //   console.log(err);  
+    // });      
+    now = moment();
+    eventData.downloadEnd = now.format('HH:mm:ss:SSS');
+    //console.log(eventData);
+
+    // ssh.getFile('/home/steel/Lab/localPath', '/home/steel/Lab/remotePath').then(function(Contents) {
+    //   console.log("The File's contents were successfully downloaded")
+    // }, function(error) {
+    //   console.log("Something's wrong")
+    //   console.log(error)
+    // })
+    drone.watchReport = eventData;
+        
   }
+
 
   /**
    * Check Response
@@ -70,4 +141,4 @@ class ReturnJason extends ModuleSSD{
   }
 }
 
-module.exports = ReturnJason;
+module.exports = ServerHealthCheck;

@@ -3,40 +3,41 @@ const moment = require('moment')
 const moduleController = require('./moduleController');
 
 class DroneSSD{
-  constructor(remoteData){
-    //console.log(remoteData);
-    if(!(remoteData.id)){
+  constructor(droneData){
+    //console.log(droneData);
+    if(!(droneData.id)){
       return false
     }    
-    this._id = remoteData.id;
-    this._type = remoteData.type;
-    this._uri = remoteData.uri;
-    this._name = remoteData.name;
-    this._timeout = remoteData.timeout ? remoteData.timeout : 10000;
-    this._active = remoteData.active===true ? remoteData.active : false;
-    this._startDT = this.now.format('YYYY-MM-DD HH:mm:ss');
-    this._checkInterval = this.prepCheckInterval(remoteData.checkInterval); // In seconds   
-    this._checkeInterval_on_fail = this.prepCheckInterval(remoteData.checkInterval_on_fail); 
-    this._checkInterval_hold = this.prepCheckInterval(remoteData.checkInterval);
-    this._continue = remoteData.continue ? remoteData.continue : false;
-    this._cycleType = remoteData.cycleType;
-    this._cycle = remoteData.cycle ? remoteData.cycle : 10;
-    this._cycleCount = remoteData.cycleCount;
-    this._errThreshold = remoteData.errThreshold ?remoteData.errThreshold : 1;
-    this._errCount = 0;
-    this._errStatus = false;
-    this._alertGroup = remoteData.alertGroup;
-    this._alertSchedule = remoteData.alertSchedule;
+    this._id = droneData.id;
+    this._active = droneData.active===true ? droneData.active : false;
+    this._alertGroup = droneData.alertGroup;
+    this._alertSchedule = droneData.alertSchedule;
     this._alertSent = {email: false, text: false};
-    this._errors = [];
-    this._watchReport = [];
-    this._moduleRack = [];
-    this._droneType = remoteData.droneType;
+    this._checkInterval = this.prepCheckInterval(droneData.checkInterval); // In seconds   
+    this._checkeInterval_on_fail = this.prepCheckInterval(droneData.checkInterval_on_fail); 
+    this._checkInterval_hold = this.prepCheckInterval(droneData.checkInterval);
+    this._continue = droneData.continue ? droneData.continue : false;
+    this._cycleType = droneData.cycleType;
+    this._cycle = droneData.cycle ? droneData.cycle : 10;
+    this._cycleCount = droneData.cycleCount;
     this._cycleTS_start = '';
     this._cycleTS_stop = '';
-    this._cycleSuccessMsg = remoteData.cycleSuccessMsg ? remoteData.cycleSuccessMsg : 'All tests passed';
+    this._cycleSuccessMsg = droneData.cycleSuccessMsg ? droneData.cycleSuccessMsg : 'All tests passed';
+    this._droneType = droneData.droneType;
+    this._errThreshold = droneData.errThreshold ?droneData.errThreshold : 1;
+    this._errCount = 0;
+    this._errStatus = false;
+    this._errors = [];
+    this._moduleRack = [];
+    this._name = droneData.name;
+    this._port = droneData.port ? droneData.port : 80;
+    this._startDT = this.now.format('YYYY-MM-DD HH:mm:ss');
+    this._timeout = droneData.timeout ? droneData.timeout : 10000;
+    this._type = droneData.type;
+    this._watchReport = [];
+    this._uri = droneData.uri;
     
-    this.rackModules(remoteData.moduleKit);
+    this.rackModules(droneData.moduleKit);
   }
 
   prepCheckInterval(val){

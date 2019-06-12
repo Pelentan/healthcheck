@@ -22,14 +22,10 @@ if [ $3 ]
 then 
   _logFile=$3
 else
-  _logFile="hc_server_scan.hc"
+  _logFile="hc-server-report.hc"
 fi
 
-expr $_droneCycles \* $_droneInterval
-
 _scanZeit=$(date +%s)
-
-echo $_logFile
 
 # Creating the file that will be downloaded.  Then initiates the scan cycles.
 _cnt=1
@@ -40,9 +36,7 @@ echo "{\"host\": \"$HOSTNAME\", \"startDT\": $_scanZeit," > ${_logFile}
 echo "\"cycleCount\": $_droneCycles, \"cycleInterval\": $_droneInterval, \"cycles\": {" >> ${_logFile}
 while [ $_cnt -le $_droneCycles ]
 do
-  echo "Starting scan $_cnt of $_droneCycles"
   _cycleZeit=$(date +%s)
-  # echo "Cycle at $_cycleZeit for $_cnt of $_droneCycles" >> ${_logFile}
   echo "\"${_cnt}\": {\"cycleCount\": $_cnt, \"cycleTime\": $_cycleZeit," >> ${_logFile}
   ((_cnt++))
 
@@ -57,7 +51,6 @@ do
   _df=$(df)
 
   # Create log file.  This is where the data is added to the file.
-  echo "Creating File"
   echo "\"uptime\": \"$_uptime\", " >> ${_logFile}
   echo "\"free\": \"$_free\"," >> ${_logFile}
   echo "\"df\": \"$_df\", " >> ${_logFile}
@@ -79,5 +72,3 @@ echo "}" >> ${_logFile}
 # I decided to make the file readable only to further keep it safe. Just in case there is someway to introduce 
 # a test "script" that add executable data to the log file.  Might be overkill, but it was one command.
 chmod 444 ${_logFile}
-
-echo "Finished"

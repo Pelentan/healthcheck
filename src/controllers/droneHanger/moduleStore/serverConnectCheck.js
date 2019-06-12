@@ -6,18 +6,16 @@ const moment = require('moment');
 const ModuleSSD = require('./moduleSSD');
 const privKeys = '/node/app/src/middleware/vinz_clortho/';
 
-class ReturnJason extends ModuleSSD{
+class ServerConnCheck extends ModuleSSD{
   constructor(moduleData){
     super(moduleData);
   }
   
   initScan(eventData, drone){
     const ssh = new node_ssh();
-
-    //console.log(eventData);
     const connSetup = {
       host:  this.url,
-      port: 22,
+      port: this.port,
       readyTimeout: this.timeout,
       username: this.authInfo.user,
       //password: "toga",
@@ -25,12 +23,12 @@ class ReturnJason extends ModuleSSD{
       passphrase: this.authInfo.pass,      
     }
     eventData.request = connSetup;
-    console.log(connSetup);
+    const now = moment();
+    eventData.dateTime = now.format('YYYY-MM-DD HH:mm:ss.SSS')
+    //console.log(connSetup);
     ssh.connect(connSetup).then(()=>{
-      console.log("Yay!");
       drone.watchReport = eventData;
     }).catch((err)=>{
-      console.log(err);
       eventData.err = true;
       eventData.errorList = err;
       drone.errors = err;
@@ -40,5 +38,4 @@ class ReturnJason extends ModuleSSD{
         
   }
 }
-
-module.exports = ReturnJason;
+module.exports = ServerConnCheck;

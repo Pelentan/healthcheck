@@ -18,7 +18,7 @@ async function timekeeper(data){
     case "count":
      // console.log(`In ${data.name} timekeeper: count for ${data.drone.cycle}`)
       let count = 0;
-      while(data.drone.continue && count <= data.drone.cycle){
+      while(data.drone.continue && count < data.drone.cycle){
         count++;        
         //console.log(`${data.name} has ${count} togas`);
         data.drone.cycleCount = count;

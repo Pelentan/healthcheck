@@ -1,31 +1,38 @@
 
-
 class ModuleSSD{
   constructor(moduleData){
     //console.log(moduleData);
-    const moduleBaseData = this.retrieve(moduleData.id);
-       
+    const moduleBaseData = this.retrieve(moduleData.id);       
+    this._privKeys = moduleBaseData.privKeys;
+    this._downloadDir = moduleBaseData.downloadDir;
+    this._uploadDir = moduleBaseData.uploadDir;;
+
     this._id = moduleData.id;
-    this._name = moduleData.name;
+    this._authInfo = moduleData.authInfo ? moduleData.authInfo : {user:"",pass:"",key:""};
+    this._authTrigger = moduleData.authTrigger ? moduleData.authTrigger : false;
     this._bodyScrape = moduleData.bodyScrape;
     this._dataPost = moduleData.dataPost;
     this._dataReturn = moduleData.dataReturn;
     this._errCount = 0; 
     this._errors = [];    
     this._headers = moduleData.headers;
+    this._name = moduleData.name;
+    this._port = moduleData.port;
     this._requestType = moduleData.requestType;
     this._returnType = moduleData.returnType;
     this._statusGood = moduleData.statusGood ? moduleData.statusGood : 200;  
     this._timeout = moduleData.timeout ? moduleData.timeout : 10000;
     this._url = moduleData.url;
-    this._authInfo = moduleData.authInfo ? moduleData.authInfo : {user:"",pass:"",key:""};
-    this._authTrigger = moduleData.authTrigger ? moduleData.authTrigger : false;
   }
 
 
   retrieve(id){
     // Not sure if I need this yet so just returning junk for now.
-    const data = {toga: "blue"}
+    const data = {
+      privKeys: '/home/hcdronedock/.ssh/',
+      downloadDir: '/node/app/oubliette/',
+      uploadDir: 'tbd',
+    }
 
     return data;
   }  
@@ -55,6 +62,30 @@ class ModuleSSD{
   }
 
   /**
+   * This takes an object with the following key:values
+   * - command:  The command being run.  Most often "bash".
+   * - script:  The name of the script being run by the "command".  All scripts must be in 'scripts/' folder.
+   * - arguments:  An array of arguments to be added after the script.
+   * - exitCode:  If set to true, 
+   * @param {*} buildData 
+   */
+  buildCommand(buildData){
+    let commandStr = "";
+    try{
+      const commandArr = [];
+      commandArr.push(buildData.command);
+      commandArr.push(`scripts/${buildData.script}`);
+      for(let i=0; i < buildData.arguments.length; i++ ){
+        commandArr.push(buildData.arguments[i]);
+      }
+      commandStr = commandArr.join(' ');
+    } catch(e){
+      commandStr = ""
+    }
+    return commandStr;
+  }
+
+  /**
    * Getter, setters and resetters
    */  
   get authInfo(){return this._authInfo;}
@@ -70,6 +101,7 @@ class ModuleSSD{
   get bodyScrape(){return this._bodyScrape;}
   get dataPost(){return this._dataPost;}
   get dataReturn(){return this._dataReturn;}
+  get downloadDir(){return this._downloadDir;}
   get errCount(){return this._errCount;}; 
   get errors(){return this._errors;}
   set errors(err){
@@ -82,6 +114,8 @@ class ModuleSSD{
   get headers(){return this._headers;}
   get id(){return this._id;};  
   get name(){return this._name;};
+  get port(){return this._port;}
+  get privKeys(){return this._privKeys;}
   get statusGood(){return this._statusGood;};   
   get returnType(){return this._returnType;}
   get requestType(){return this._requestType;}
@@ -90,6 +124,7 @@ class ModuleSSD{
     this._timeout = timeout;
     return this._timeout;
   }
+  get uploadDir(){return this._uploadDir;}
   get url(){return this._url;};
 }
 
