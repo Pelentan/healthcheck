@@ -1,4 +1,7 @@
 const UserMech = require('./userMech');
+require('../../db/mongoose');
+const User = require('../../models/users');
+const Group = require('../../models/groups');
 
 class UserController{
   constructor(){

@@ -1,24 +1,19 @@
-const express = require('express')
-//require('./db/mongoose')
-const adminRouter = require('./routers/admin')
+const express = require('express');
+require('./db/mongoose');
+const adminRouter = require('./routers/admin');
+const userRouter = require('./routers/users');
+const groupRouter = require('./routers/group');
 // this is definitely uncool.
-const app = express()
-const port = process.env.APP_PORT || 3000
+const app = express();
+const port = process.env.APP_PORT || 3000;
 
-app.use(express.json())
-app.use(adminRouter)
-
-
-app.post('/users', (req, res) => {
-    console.log(req.body)
-    res.send(req.body)
-})
-
-app.get('/', (req, res) => {
-    res.send('Hello Dave!  Would you like to play a game? How about Jumanji? Yes please. \n');
-});
-  
+app.use(express.json());
+app.use(adminRouter);
+app.use(userRouter);
+app.use(groupRouter);
 
 app.listen(port, () =>{
-    console.log(`Server is up on ${port}`)
+    console.log('db is: ' + process.env.MDB + " || " + process.env.MONGODB)
+    console.log('Server is up on port number ' + port)
+    console.log("Location: " + process.env.LOCATION)
 })

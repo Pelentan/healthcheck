@@ -18,12 +18,12 @@ const roundReport = (drone) => {
     invokeErrProt(drone);       
   }else{
     invokeSuccessProt(drone);
-    }
+  }
 }
 
 const invokeErrProt =(drone)=>{
   drone.incErrCount(); 
-  console.log("errorsy count: " + drone.errCount + " == " + drone.errThreshold);
+  console.log("error count: " + drone.errCount + " == " + drone.errThreshold);
   console.log(`***FAIL*** ${drone.cycleTS_start} - ${drone.cycleTS_stop}` + " ==> " + drone.name + " -- " + drone.cycleSuccessMsg);
  //console.log(drone);
   if(drone.errCount === drone.errThreshold){

@@ -11,8 +11,8 @@ class ServerConnCheck extends ModuleSSD{
     super(moduleData);
   }
   
-  initScan(eventData, drone){
-    const ssh = new node_ssh();
+  async initScan(eventData, drone){
+    let ssh = new node_ssh();
     const connSetup = {
       host:  this.url,
       port: this.port,
@@ -28,6 +28,7 @@ class ServerConnCheck extends ModuleSSD{
     //console.log(connSetup);
     ssh.connect(connSetup).then(()=>{
       drone.watchReport = eventData;
+      ssh.dispose()
     }).catch((err)=>{
       eventData.err = true;
       eventData.errorList = err;
@@ -35,7 +36,6 @@ class ServerConnCheck extends ModuleSSD{
       eventData.shortMsg = "Failed to make connection";
       drone.watchReport = eventData;
     });
-        
   }
 }
 module.exports = ServerConnCheck;

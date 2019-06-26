@@ -2,10 +2,11 @@ version: '3.7'
 services:
     health-check:
         container_name: health-check
+        image: health-check
         build:
             context: .
             dockerfile: .docker/node.dockerfile
-        command: npm run start
+        command: npm run dev
         env_file: 
             - .env
         environment:
@@ -36,7 +37,12 @@ services:
             - traefik.enable=false
     hc-mongo:
         container_name: hc-mongo
-        image: mongo:4.1.8        
+        build:
+            context: .
+            dockerfile: .docker/mongo.dockerfile
+        image: hc-mongo        
+        env_file: 
+            - hc_mongo_dev.env
         environment:
             MONGO_INITDB_ROOT_USERNAME: root
             MONGO_INITDB_ROOT_PASSWORD: tango

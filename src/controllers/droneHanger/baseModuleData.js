@@ -1,6 +1,6 @@
 baseModuleData = {
   1: {
-    id: 1,
+    type: 1,
     name: 'Check HTML Return',
     description: '',
     file: 'scanReturnHtml',
@@ -10,7 +10,7 @@ baseModuleData = {
     returnType: 'html',
   },
   2: {
-    id: 2,
+    type: 2,
     name: 'Check Json Return',
     description: '',
     file: 'returnJson',
@@ -20,7 +20,7 @@ baseModuleData = {
     returnType: 'json',
   },
   3: {
-    id: 3,
+    type: 3,
     name: 'Check Server Return',
     description: '',
     file: 'serverConnectCheck',
@@ -30,7 +30,7 @@ baseModuleData = {
     returnType: 'json',
   }, 
   4: {
-    id: 4,
+    type: 4,
     name: 'Server Health Check',
     description: '',
     file: 'serverHealthCheck',

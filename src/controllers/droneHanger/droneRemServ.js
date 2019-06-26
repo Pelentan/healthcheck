@@ -1,7 +1,6 @@
 const request = require('request');
 const moment = require('moment');
 
-//const auger = require('../dispatch/augur');
 const auger = require('../dispatch/auger');
 const DroneSSD = require('../droneHanger/droneSSD');
 
@@ -34,19 +33,12 @@ class DroneRemServ extends DroneSSD{
     console.log("Rack size: " + this.moduleRack.length);
     while(this.moduleRack.length > this.watchReport.length){
       console.log("WatchReport size: " + this.watchReport.length);
-      console.log("waiting for cycle to finish");
+      console.log("Waiting for cycle to finish");
       await new Promise((resolve, reject)=>setTimeout(resolve, 500));
     }
 
-    //console.log(this);
     this.cycleTS_stop = '04/01/1968';
     auger(this);
-
-    // console.log("after await");
-    // console.log(this.watchReport);
-    // console.log("ERRORS");
-    // console.log(this.errCount);
-    // console.log(this.errors);
   }
 
 }

@@ -39,6 +39,7 @@ class ServerHealthCheck extends ModuleSSD{
       return true;
     });
     const command = this.buildCommand(this.dataPost);
+    let remFileName = "";
     await ssh.execCommand(`${command}`).then((result) => {
       if(this.dataPost.exitCode && this.dataPost.exitCodePass != result.code){
         eventData.err = true;
@@ -48,10 +49,10 @@ class ServerHealthCheck extends ModuleSSD{
         drone.watchReport = eventData;
         return true;
       }
+      remFileName = result.stdout;
       eventData.errors = result.stderr;
     }).catch((err)=>{
-      console.log("Woopsy!");
-      console.log(err);
+      //console.log(err);
       eventData.err = true;
       eventData.errorList = err;
       drone.errors = err;
@@ -59,59 +60,63 @@ class ServerHealthCheck extends ModuleSSD{
       drone.watchReport = eventData;
       return true;
     }); 
+    // ***Required!!!  Or it won't release the connection!****
+    ssh.dispose();
+
+    const downloadFile = `${this.downloadDir}${remFileName}`
+    const remoteFile = `${this.dataReturn.returnFile}`;
+    console.log(`Remote file: ${remoteFile}`);
+    console.log(`Download file: ${downloadFile}`);
     
-    now = moment();
-    let fileTS = now.format('HH_mm_ss^SSS');
-    const downloadFile = `${this.downloadDir}/${this.dataReturn.returnFile}`
-    const remoteFile = `${connSetup.username}@${connSetup.host}:~/${this.dataReturn.returnFile}`;
-    
-    const pk = `${this.privKeys}${this.authInfo.key}`;
     eventData.downloadStart = now.format('HH:mm:ss:SSS');
-    
-    const clown = require('child_process').exec
-    // console.log(`Remote file: ${remoteFile}`);
-    // console.log(`Download file: ${downloadFile}`);
-    // console.log(this);
-    const executor = clown(`scp -i ${pk} ${remoteFile} ${downloadFile}`);
-    //const executor = clown('scp -i /home/hcdronedock/.ssh/hc_npp hcdronedock@hc-mongo:hc-server-report.hc .')
-    
-    executor.stderr.on('data', function(data) {
-      console.log(data.toString());
-    });
-    
-    executor.stdout.on('data', function(data) {
-        console.log(data.toString());
-    });
-    
-    executor.stdout.on('end', function(data) {
-        console.log("copied");
-    });
 
-    executor.on('error', (err)=>{console.log(err);})
-    
-    executor.on('close', function(code) {
-        if (code !== 0) {
-            console.log('Failed: ' + code);
-        }
-    });
+    const scpData = {
+      ...connSetup,
+      remoteFile: this.dataReturn.returnFile,
+      localFile: downloadFile,
+    }
 
-    // await ssh.getFile(downloadFile, remoteFile).then((fileContents)=>{
-    //   console.log(fileContents);
-    // }).catch((err)=>{    
-    //   console.log(err);  
-    // });      
+    const scpCall = new SCP(scpData);
+    const scpReturn = await scpCall.pullFile();
+    //console.log(scpReturn);
+    if(scpReturn.err){
+      eventData.err = true;
+      eventData.errorList = scpReturn.err;
+      drone.errors = scpReturn.err;
+      evendData.shortMsg = "HC unable to download file";
+      drone.watchReport = eventData;
+      return true;
+    } else if(scpReturn.stderr){
+      eventData.errorList = scpReturn.stderr;
+    }
+
+
+    const fileContents = fs.readFileSync(downloadFile, 'utf8');
+    const testFile = JSON.parse(fileContents);
+    const numCycles = Object.keys(testFile.cycles).length;
+
+    if(numCycles !== this.dataPost.arguments[0]){
+      console.log("Number of cycles done doesn't match requested.  This is probably bad.")
+    }
+
+    const testData = testFile.cycles[numCycles.toString()];
+    if(testData.free){
+      const freeParse = require('../../argh/parseLinuxFree');
+      const parsedFree = freeParse(testData.free);
+      //console.log(parsedFree);
+      testData.free = parsedFree;
+    }
+
+    console.log(testData.df.split("\n"));
+
+    console.log(testData);
+
+    console.log(Math.floor(new Date() / 1000));
     now = moment();
     eventData.downloadEnd = now.format('HH:mm:ss:SSS');
-    //console.log(eventData);
-
-    // ssh.getFile('/home/steel/Lab/localPath', '/home/steel/Lab/remotePath').then(function(Contents) {
-    //   console.log("The File's contents were successfully downloaded")
-    // }, function(error) {
-    //   console.log("Something's wrong")
-    //   console.log(error)
-    // })
-    drone.watchReport = eventData;
-        
+    eventData.respCode = 0;
+    eventData.response = "";
+    drone.watchReport = eventData;        
   }
 
 

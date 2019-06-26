@@ -1,23 +1,30 @@
-const MongoClient = require('mongodb').MongoClient;
+const {MongoClient, ObjectID} = require('mongodb');
 
-MongoClient.connect('mongodb://root:tango@ca-mongo', (err, client)=>{
+const connectionUrl = 'mongodb://root:tango@hc-mongo';
+const dbName = 'health-check';
+
+const id = new ObjectID();
+console.log(id);
+
+MongoClient.connect(connectionUrl, {useNewUrlParser: true}, (err, client)=>{
     if (err){
         return console.log(`Can't get to it ${err}`);
     }
     console.log("Made it");
-    const db = client.db('ToDoApp');
+    const db = client.db(dbName);
    
-    
-    db.collection('Todos').insertOne({
-        text: "Firing of the Crucible",
-        completed: true
-    }, (err, result) => {
-        if(err){
-            return console.log("Couldn't add", err);
-        }
 
-        console.log(JSON.stringify(result.ops, undefined, 2));
-    });
+    
+    // db.collection('Todos').insertOne({
+    //     text: "Firing of the Crucible",
+    //     completed: true
+    // }, (err, result) => {
+    //     if(err){
+    //         return console.log("Couldn't add", err);
+    //     }
+
+    //     console.log(JSON.stringify(result.ops, undefined, 2));
+    // });
 
     client.close();
 } );

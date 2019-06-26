@@ -1,35 +1,36 @@
 
 const moment = require('moment');
 
-// const SiteController = require('../sites/siteController');
-// const ApiController = require('../apis/apiController');
 const DroneController = require('../droneHanger/droneController');
-const timekeeper = require('./timekeeper');
-
-const now = moment();
-const logNow = now.format('YYYY-MM-DD HH:mm:ss');
-
+const Drone = require('../../models/drones');
 
 class dispatchController{
   constructor(){
-    this.actionGroups = {};
-    this.buildActionGroups();
+    this.carrierGroups = {};
+    this.buildCarrierGroups();
   }
 
-  buildActionGroups(){
-    this.actionGroups.WatchDrones = new DroneController('watch');
-    //console.log(this.watchGroups);
+  async buildCarrierGroups(){
+    this.activeGroups = await DroneController.getGroupNames();
+    console.log("Active groups: " + this.activeGroups);
+    const actLen = this.activeGroups.length;
+    let group = '';
+    for (let x = 0; x < actLen; x++){ 
+      group = this.activeGroups[x]
+      this.carrierGroups[group] = new DroneController(group);
+    }
+    //console.log(this.carrierGroups);
   }
 
   initiateWatch(){
-    for(let group in this.actionGroups){
-      if(!this.actionGroups[group].active)continue;
+    for(let group in this.carrierGroups){
+      if(!this.carrierGroups[group].active || this.carrierGroups[group].deployed)continue;
       if(group === "WatchDrones"){
         console.log("Initiate Drone Watch");
-        const action = "makeRounds";
-        this.actionGroups[group].standWatch();
+        this.carrierGroups[group].standWatch();
       }
     }
+    return true;
   }
 }
 
