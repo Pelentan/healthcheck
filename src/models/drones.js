@@ -98,13 +98,18 @@ const droneSchema = new Schema({
 droneSchema.statics.getGroupNames = async ()=>{
   const groups = await Drone.find({active: true},'droneType').distinct('droneType');
   return groups;
-}
+};
 
 droneSchema.statics.getDronesByType = async (groups)=>{
   const drones = await Drone.find({droneType: groups, active: true}).catch((err)=>{console.log(err)});
   //console.log("data?: " + drones);
   return drones;
-}
+};
+
+droneSchema.statics.getDroneBy = async (crit)=>{
+  const drone = await Drone.findOne({...crit}).catch((err)=>{console.log(err)});
+  return drone;
+};
 
 const Drone = mongoose.model('Drones', droneSchema);
 

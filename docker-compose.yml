@@ -8,11 +8,7 @@ services:
             dockerfile: .docker/node.dockerfile
         command: npm run dev
         env_file: 
-            - .env
-        environment:
-            - LOCATION=Dev
-            - MDB=${MONGODB}
-            - NODE_ENV=development
+            - ./.docker/env_files/hc_app_dev.env
         volumes:
           - .:/node/app
           - /node/app/node_modules
@@ -42,27 +38,21 @@ services:
             dockerfile: .docker/mongo.dockerfile
         image: hc-mongo        
         env_file: 
-            - hc_mongo_dev.env
-        environment:
-            MONGO_INITDB_ROOT_USERNAME: root
-            MONGO_INITDB_ROOT_PASSWORD: tango
+            - ./.docker/env_files/hc_mongo_dev.env
         networks:
             - node-net
         labels:
             - traefik.enable=false
         volumes:
-            - mongo-db:/data/db
+            - hc-mongo-db:/data/db
 
     hc-mongo-express:
         container_name: hc-monex
         image: mongo-express
-        restart: always
         ports:
            - 8081:8081
-        environment:
-            ME_CONFIG_MONGODB_ADMINUSERNAME: root
-            ME_CONFIG_MONGODB_ADMINPASSWORD: tango
-            ME_CONFIG_MONGODB_SERVER: hc-mongo
+        env_file: 
+            - ./.docker/env_files/hc_mongo_exp.env        
         networks:
             - node-net
         labels:
@@ -72,8 +62,8 @@ services:
             - traefik.backend=hc-mongx 
             
 volumes:
-    mongo-db:
-        external: false
+    hc-mongo-db:
+        external: true
 
 
 networks:

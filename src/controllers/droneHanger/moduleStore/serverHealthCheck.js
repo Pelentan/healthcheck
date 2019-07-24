@@ -40,6 +40,9 @@ class ServerHealthCheck extends ModuleSSD{
     });
     const command = this.buildCommand(this.dataPost);
     let remFileName = "";
+    console.log("Set me up before you go go! ");
+    console.log(connSetup);
+    console.log("By your command.  " + command);
     await ssh.execCommand(`${command}`).then((result) => {
       if(this.dataPost.exitCode && this.dataPost.exitCodePass != result.code){
         eventData.err = true;
@@ -47,6 +50,8 @@ class ServerHealthCheck extends ModuleSSD{
         drone.errors = result.stderr;
         eventData.shortMsg = "HC script failed to complete.";
         drone.watchReport = eventData;
+        console.log("event");
+        console.log(eventData);
         return true;
       }
       remFileName = result.stdout;

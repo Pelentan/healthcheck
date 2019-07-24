@@ -1,11 +1,10 @@
 
 class ModuleSSD{
   constructor(moduleData){
-    //console.log(moduleData);
-    const moduleBaseData = this.retrieve(moduleData.id);       
-    this._privKeys = moduleBaseData.privKeys;
-    this._downloadDir = moduleBaseData.downloadDir;
-    this._uploadDir = moduleBaseData.uploadDir;;
+    //const moduleBaseData = this.retrieve(moduleData.id);       
+    this._privKeys = process.env.PRIVKEYS;
+    this._downloadDir = process.env.DOWNLOADDIR;
+    this._uploadDir = process.env.UPLOADDIR;
 
     this._id = moduleData.id;
     this._authInfo = moduleData.authInfo ? moduleData.authInfo : {user:"",pass:"",key:""};
@@ -29,9 +28,7 @@ class ModuleSSD{
   retrieve(id){
     // Not sure if I need this yet so just returning junk for now.
     const data = {
-      privKeys: '/home/hcdronedock/.ssh/',
-      downloadDir: '/node/app/oubliette/',
-      uploadDir: 'tbd',
+      toge: "blue",
     }
 
     return data;

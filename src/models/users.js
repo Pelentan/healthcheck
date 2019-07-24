@@ -1,7 +1,8 @@
 const mongoose = require("mongoose")
 const Schema = mongoose.Schema;
 const bcrypt = require("bcrypt")
-const validator = require("validator")
+const validator = require("validator");
+const uniVali = require('mongoose-unique-validator');
 //const jwt = require('jsonwebtoken')
 
 const userSchema = new Schema({
@@ -28,6 +29,8 @@ const userSchema = new Schema({
     email: {
         type: String,
         required: true,
+        unique: true,
+        uniqueCaseInsensitive: true,
         trim: true,
         lowercase: true,
         validate(value){
@@ -39,17 +42,23 @@ const userSchema = new Schema({
     accessLevel: {
         type: Number,
         required: true,
-        trime: true,
+        trim: true,
     },
     phone: {
-        type: String
+        type: String,
+        unique: true,
     },
     textProvider: {
         type: String
+    },
+    schedules:{
+        type: Object,
     }
 }, {
     timestamps: true
 })
+
+userSchema.plugin(uniVali);
 
 userSchema.methods.toJSON = function () {
     const user = this

@@ -22,7 +22,7 @@ droneData = {
     errCount: 0,   
     moduleKit: [
       {
-        mod_id: '5d111ec962a1d60275c18f3e',
+        mod_id: '5d30cc309c37a300b5445e05',
         name: 'Verify Get User',
         url: '/users/1',
         port: '',
@@ -50,7 +50,7 @@ droneData = {
         authTrigger: '',
       },
       {
-        mod_id: '5d111ec962a1d60275c18f3e',
+        mod_id: '5d30cccc6c939300cfa7332f',
         name: 'Verify Post User',
         url: '/posts',
         port: '',
@@ -101,7 +101,7 @@ droneData = {
     errCount: 0,   
     moduleKit: [
       {
-        mod_id: '5d111e860b25f0025b368e04',
+        mod_id: '5d30cd45a13e7500e9461194',
         url: '',
         port: '',
         addHeaders: [],
@@ -144,7 +144,7 @@ droneData = {
     errCount: 0,   
     moduleKit: [
       {
-        mod_id: '5d111eed796a5d028fe35d42',
+        mod_id: '5d30cf250a409c01035d96a6',
         name: 'Verify Connection',
         url: '',
         port: 22,
@@ -164,7 +164,7 @@ droneData = {
         authTrigger: true,
       },
       {
-        mod_id: '5d111f2082a50c02a97f6b3b',
+        mod_id: '5d30c932ca42800057eb1936',
         name: 'Initiate server test-script(s) and retrive log file of results.',
         url: '',
         port: 22,

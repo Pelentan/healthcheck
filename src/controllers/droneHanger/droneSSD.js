@@ -1,6 +1,6 @@
 const moment = require('moment')
 
-const moduleController = require('./moduleController');
+const ModuleController = require('./moduleController');
 
 class DroneSSD{
   constructor(droneData){
@@ -71,9 +71,12 @@ class DroneSSD{
    * @param {*} moduleList 
    */
   rackModules(moduleList){
-    moduleList.forEach(moduleData => {
+    const moduleController = new ModuleController();
+    moduleList.forEach(async moduleData => {
       moduleData.url = this.uri + moduleData.url;
-      let module = moduleController(moduleData);
+      module = await moduleController.buildModule(moduleData);
+      // console.log("module returned");
+      // console.log(module);
       this._moduleRack.push(module);      
     });
   }

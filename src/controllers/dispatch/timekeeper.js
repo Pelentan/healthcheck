@@ -1,5 +1,17 @@
 const moment = require('moment');
 
+/**
+ * 
+ * @param {*} data 
+ * data = {
+        id: id,
+        name: drone.name, <-- used just for debugging
+        action, <-- the function being done.  Most cases for a carrier to send out drones
+        drone, <-- currently sending in ref to drone.  My refactor out to just needed parts.
+        cycleType: drone.cycleType,
+      };
+ */
+
 async function timekeeper(data){  
   const now = moment();
   let start = now.format('YYYY-MM-DD HH:mm:ss');

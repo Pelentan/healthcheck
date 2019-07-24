@@ -1,10 +1,10 @@
-const mongoose = require("mongoose")
+const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
-const bcrypt = require("bcrypt")
+const bcrypt = require("bcrypt");
 
 const db = process.env.MONGODB;
-const databaseName = process.env.MONGODBNAME
-const connectionURL = `mongodb://${db}/${databaseName}`
+const databaseName = process.env.MONGODBNAME;
+const connectionURL = `mongodb://${db}/${databaseName}`;
 
 mongoose.connect(connectionURL, {
     useNewUrlParser: true,

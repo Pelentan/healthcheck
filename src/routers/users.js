@@ -4,7 +4,14 @@ const User = require('../models/users')
 const router = new express.Router
 
 router.get('/users', async(req, res)=>{
-  res.send('Checen fer userses!\n');
-})
+  console.log(req.params);
+  res.send("hello");
+});
+
+router.post('/users', async(req, res)=>{
+  const user = new User(req.body);
+  console.log(req.params);
+  res.status(200).send(user);
+});
 
 module.exports = router

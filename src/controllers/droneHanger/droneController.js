@@ -27,8 +27,9 @@ class DroneController{
         droneBase = droneData[key].droneBase;
         Drone = require('./' + droneBase);
       }
-      console.log("toga");
       this._droneCarrier[key] = new Drone(droneData[key]);
+      // console.log("drones");
+      // console.log(this._droneCarrier[key]);
       if(this._droneCarrier[key].active)this._active = true;
     }
   }
@@ -52,8 +53,17 @@ class DroneController{
 
   static async _getDroneData(droneType){
     const droneData =  await DroneModel.getDronesByType(droneType).catch((err)=>{console.log(err)});
-    console.log(droneData);
+    //console.log(droneData);
     return droneData;
+  }
+
+  static async getDroneBy(criteriaIn){
+    const criteria = {};
+    for(let key in criteriaIn){
+      criteria[key] = new RegExp(`${criteriaIn[key]}`,'i')
+    }
+    const drone = await DroneModel.getDroneBy(criteria).catch((err)=>{console.log(err)});
+    return drone;
   }
 
   static getGroupNames(){
