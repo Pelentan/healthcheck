@@ -1,4 +1,4 @@
-FROM mongo:4.1.8 as prod
+FROM mongo:4.2.0 as prod
 
 RUN apt-get update && apt-get install -qy \ 
     ca-certificates \

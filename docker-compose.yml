@@ -13,8 +13,8 @@ services:
           - .:/node/app
           - /node/app/node_modules
           - .node_logs:/root/.npm/
-        expose:
-            - ${APP_PORT}
+        # expose:
+        #     - ${APP_PORT}
         networks:
             - node-net
             - lendDocNet
@@ -24,13 +24,36 @@ services:
             - traefik.port=${APP_PORT}
             - traefik.docker.network=traefik
             - traefik.backend=health-check 
+            - traefik.enable=true          
+        deploy:
+            mode: replicated
+            replicas: 1
+            placement:
+                constraints: 
+                    - node.labels.trused == true
+            restart_policy:
+                condition: on-failure
+            labels:
+            - "traefik.port=8080"
+            - "traefik.frontend.rule=Host:registry.mylendpro.com"
+            - "traefik.docker.network=traefik"  
+            - "traefik.enable=true"
     hc-redis:
         container_name: hc-redis
         image: redis:alpine
         networks:
             - node-net
         labels:
-            - traefik.enable=false
+            - traefik.enable=false  
+        deploy:
+            mode: global
+            placement:
+                constraints: 
+                    - node.labels.trusted == true
+            restart_policy:
+                condition: on-failure
+            labels: 
+                - "traefik.enable=false"
     hc-mongo:
         container_name: hc-mongo
         build:
@@ -44,13 +67,22 @@ services:
         labels:
             - traefik.enable=false
         volumes:
-            - hc-mongo-db:/data/db
+            - hc-mongo-db:/data/db            
+        deploy:
+          mode: global
+          placement:
+            constraints: 
+            - node.labels.registry == true
+          restart_policy:
+            condition: on-failure
+          labels: 
+            - "traefik.enable=false"
 
     hc-mongo-express:
         container_name: hc-monex
         image: mongo-express
         ports:
-           - 8081:8081
+           - 8881:8081
         env_file: 
             - ./.docker/env_files/hc_mongo_exp.env        
         networks:
@@ -60,11 +92,24 @@ services:
             - traefik.port=8081 
             - traefik.docker.network=traefik
             - traefik.backend=hc-mongx 
+            - traefik.enable=true
+        deploy:
+          mode: global
+          placement:
+            constraints: 
+                - node.labels.trusted == true
+          restart_policy:
+            condition: on-failure
+          labels: 
+            - traefik.frontend.rule=Host:hc-mongx.mylendpro.com
+            - traefik.port=8081 
+            - traefik.docker.network=traefik
+            - traefik.backend=hc-mongx 
+            - traefik.enable=true
             
 volumes:
     hc-mongo-db:
         external: true
-
 
 networks:
     node-net:
